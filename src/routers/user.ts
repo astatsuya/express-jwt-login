@@ -13,11 +13,11 @@ router.get(routers.USER, (_, res, next) => {
 });
 
 router.post(routers.USER, async (req, res, next) => {
-  const { username, email } = req.body;
+  const { username, email, password } = req.body;
   try {
-    const user = new User({ username, email });
+    const user = new User({ username, email, password });
     await user.save();
-    res.send(user);
+    res.send("created a user");
   } catch (err) {
     next();
   }
