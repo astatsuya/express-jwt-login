@@ -1,7 +1,12 @@
 import express from "express";
+import { logError } from "./middleware/logger";
+import * as user from "./routers/user";
+import * as notFound from "./routers/notFound";
 
 export const app = express();
+app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("app");
-});
+app.use(user.router);
+app.use(notFound.router);
+
+app.use(logError);
