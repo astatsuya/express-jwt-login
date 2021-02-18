@@ -1,5 +1,6 @@
 import { model, Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
+import validator from "validator";
 
 export type User = {
   username: string;
@@ -19,11 +20,23 @@ const userSchema: Schema<User> = new Schema(
       unique: true,
       required: true,
       trim: true,
+      validate(value: any) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Email is invalid");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
       trim: true,
+      minLength: 8,
+      maxLength: 20,
+      validate(value: any) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Password is invalid");
+        }
+      },
     },
   },
   {

@@ -19,6 +19,15 @@ router.post(routers.USER, async (req, res, next) => {
     await user.save();
     res.send("created a user");
   } catch (err) {
+    console.log(err);
+    // duplicate email
+    if (err?.code === 11000) {
+      res.status(400).send({ "Bad Request": err.message });
+    }
+    // invalid field
+    if (err?.errors?.email || err?.errors?.password) {
+      res.status(400).send({ "Bad Request": err.message });
+    }
     next();
   }
 });
