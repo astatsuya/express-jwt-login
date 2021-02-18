@@ -1,4 +1,5 @@
 import express from "express";
+import "./db/index";
 import { logError } from "./middleware/logger";
 import * as user from "./routers/user";
 import * as notFound from "./routers/notFound";
