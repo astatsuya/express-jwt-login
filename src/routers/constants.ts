@@ -1,4 +1,4 @@
 export const routers = {
-  USER: "/user",
+  USER: "/users",
   NOT_FOUND: "*",
 } as const;
