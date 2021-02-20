@@ -6,13 +6,8 @@ import { auth } from "../middleware/auth";
 
 export const router = Router();
 
-router.get(routers.USER, async (_, res, next) => {
-  try {
-    const user = await User.find({});
-    res.send(user);
-  } catch (err) {
-    next();
-  }
+router.get(`${routers.USER}/profile`, auth, async (_, res, next) => {
+  res.send(res.locals.user);
 });
 
 router.post(routers.USER, async (req, res, next) => {

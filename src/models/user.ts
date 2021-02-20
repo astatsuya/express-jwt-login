@@ -60,7 +60,9 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
   if (!secret) {
     throw new Error("cannot read secret from environment variables");
   }
-  const token = jwt.sign({ _id: String(user.id) }, secret);
+  const token = jwt.sign({ _id: String(user.id) }, secret, {
+    expiresIn: 5 * 60, // 5 minutes,
+  });
   user.tokens = [...user.tokens, { token }];
   await user.save();
   return token;
