@@ -1,12 +1,14 @@
 import { Request, Router } from "express";
+
 import { routers } from "./constants";
 import { User } from "../models/user";
 
 export const router = Router();
 
-router.get(routers.USER, (_, res, next) => {
+router.get(routers.USER, async (_, res, next) => {
   try {
-    res.send("user page");
+    const user = await User.find({});
+    res.send(user);
   } catch (err) {
     next();
   }
@@ -17,7 +19,8 @@ router.post(routers.USER, async (req, res, next) => {
   try {
     const user = new User({ username, email, password });
     await user.save();
-    res.send("created a user");
+    const token = await user.generateAuthToken();
+    res.send({ message: "created a user", token });
   } catch (err) {
     console.log(err);
     // duplicate email

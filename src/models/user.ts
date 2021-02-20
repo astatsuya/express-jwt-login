@@ -1,11 +1,14 @@
 import { model, Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import jwt from "jsonwebtoken";
 
 export type User = {
   username: string;
   email: string;
   password: string;
+  tokens: string[];
+  generateAuthToken: () => Promise<string>;
 } & Document;
 
 const userSchema: Schema<User> = new Schema(
@@ -31,18 +34,30 @@ const userSchema: Schema<User> = new Schema(
       required: true,
       trim: true,
       minLength: 8,
-      maxLength: 20,
       validate(value: any) {
         if (!validator.isStrongPassword(value)) {
           throw new Error("Password is invalid");
         }
       },
     },
+    tokens: [{ type: String, required: true }],
   },
   {
     timestamps: true,
   }
 );
+
+userSchema.methods.generateAuthToken = async function (): Promise<string> {
+  const user = this;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("cannot read secret from environment variables");
+  }
+  const token = jwt.sign({ _id: String(user.id) }, secret);
+  user.tokens = [...user.tokens, token];
+  await user.save();
+  return token;
+};
 
 // hash password
 userSchema.pre("save", async function (next) {
