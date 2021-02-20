@@ -54,6 +54,12 @@ const userSchema: Schema<User> = new Schema(
   }
 );
 
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const { password, tokens, ...userObject } = user.toObject();
+  return userObject;
+};
+
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
   const user = this;
   const secret = process.env.JWT_SECRET;
