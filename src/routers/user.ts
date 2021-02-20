@@ -20,7 +20,7 @@ router.post(routers.USER, async (req, res, next) => {
     const user = new User({ username, email, password });
     await user.save();
     const token = await user.generateAuthToken();
-    res.send({ message: "created a user", token });
+    res.status(201).send({ message: "created a user", token });
   } catch (err) {
     // duplicate email
     if (err?.code === 11000) {

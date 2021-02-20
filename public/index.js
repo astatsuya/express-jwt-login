@@ -17,6 +17,10 @@ const handleSubmit = addEventListener("submit", async (e) => {
     const data = await response.json();
     // statusコードが400, 500系でもエラー扱いされない。
     console.log(data);
+    if (response.status === 201) {
+      const { token } = data;
+      localStorage.setItem("token", token);
+    }
   } catch (err) {
     console.log(err);
     window.alert("error");
