@@ -3,7 +3,14 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 
-export type User = {
+export type UserField = {
+  username: string;
+  email: string;
+  password: string;
+  tokens: { token: string }[];
+};
+
+export type User = UserField & {
   username: string;
   email: string;
   password: string;

@@ -1,5 +1,6 @@
 export const routers = {
   USER: "/users",
+  USER_PROFILE: "/users/profile",
   LOGIN: "/users/login",
   LOGOUT: "/users/logout",
   NOT_FOUND: "*",

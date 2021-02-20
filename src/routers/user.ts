@@ -1,12 +1,12 @@
 import { Request, Router } from "express";
 
 import { routers } from "./constants";
-import { User } from "../models/user";
+import { User, UserField } from "../models/user";
 import { auth } from "../middleware/auth";
 
 export const router = Router();
 
-router.get(`${routers.USER}/profile`, auth, async (_, res, next) => {
+router.get(routers.USER_PROFILE, auth, async (_, res, next) => {
   try {
     res.send(res.locals.user);
   } catch (err) {
@@ -30,6 +30,31 @@ router.post(routers.USER, async (req, res, next) => {
     if (err?.errors?.email || err?.errors?.password) {
       res.status(400).send({ "Bad Request": err.message });
     }
+    next(err);
+  }
+});
+
+router.patch(routers.USER_PROFILE, auth, async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    const requestKeys = Object.keys(req.body);
+    const allowedUpdates: (keyof Pick<UserField, "username" | "password">)[] = [
+      "username",
+      "password",
+    ];
+    const isValidRequest = requestKeys.every((key) =>
+      ((allowedUpdates as any) as string[]).includes(key)
+    );
+
+    if (!isValidRequest) {
+      return res.status(400).send({ error: "Invalid request" });
+    }
+    requestKeys.forEach((key) => {
+      user[key as "username" | "password"] = req.body[key];
+    });
+    await user.save();
+    res.send("user status was updated!");
+  } catch (err) {
     next(err);
   }
 });
