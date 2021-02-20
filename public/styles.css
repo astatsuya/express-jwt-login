@@ -1,0 +1,36 @@
+h2 {
+  margin: 2em auto;
+  text-align: center;
+}
+
+form {
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  display: flex;
+}
+
+li + li {
+  margin-top: 1em;
+}
+
+label {
+  text-align: right;
+  width: 70px;
+}
+
+input {
+  margin-left: 1em;
+}
+
+button {
+  margin-top: 1em;
+  cursor: pointer;
+}
