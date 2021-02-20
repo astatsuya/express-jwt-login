@@ -1,6 +1,6 @@
 import express from "express";
 import "./db/index";
-import { logError } from "./middleware/logger";
+import { logErrors, errorHandler } from "./middleware/errorHandler";
 import * as user from "./routers/user";
 import * as notFound from "./routers/notFound";
 
@@ -10,4 +10,5 @@ app.use(express.json());
 app.use(user.router);
 app.use(notFound.router);
 
-app.use(logError);
+app.use(logErrors);
+app.use(errorHandler);

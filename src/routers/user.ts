@@ -6,8 +6,12 @@ import { auth } from "../middleware/auth";
 
 export const router = Router();
 
-router.get(`${routers.USER}/profile`, auth, async (_, res) => {
-  res.send(res.locals.user);
+router.get(`${routers.USER}/profile`, auth, async (_, res, next) => {
+  try {
+    res.send(res.locals.user);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post(routers.USER, async (req, res, next) => {
@@ -26,24 +30,32 @@ router.post(routers.USER, async (req, res, next) => {
     if (err?.errors?.email || err?.errors?.password) {
       res.status(400).send({ "Bad Request": err.message });
     }
-    next();
+    next(err);
   }
 });
 
-router.post(routers.LOGIN, async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findByCredentials({ email, password });
-  if (!user) {
-    res.status(404).send("cannot found user");
+router.post(routers.LOGIN, async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findByCredentials({ email, password });
+    if (!user) {
+      res.status(404).send("cannot found user");
+    }
+    const token = await user.generateAuthToken();
+    res.send({ message: "success login!", token });
+  } catch (err) {
+    next(err);
   }
-  const token = await user.generateAuthToken();
-  res.send({ message: "success login!", token });
 });
 
-router.post(routers.LOGOUT, auth, async (_, res) => {
-  const { user, token: newToken } = res.locals;
-  user.tokens = user.tokens.filter((token) => token.token !== newToken);
+router.post(routers.LOGOUT, auth, async (_, res, next) => {
+  try {
+    const { user, token: newToken } = res.locals;
+    user.tokens = user.tokens.filter((token) => token.token !== newToken);
 
-  await user.save();
-  res.send({ message: "logout" });
+    await user.save();
+    res.send({ message: "logout" });
+  } catch (err) {
+    next(err);
+  }
 });

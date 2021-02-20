@@ -5,7 +5,7 @@ import type {
   NextFunction,
 } from "express";
 
-export const logError = (
+export const logErrors = (
   err: ErrorRequestHandler,
   _: Request,
   __: Response,
@@ -13,4 +13,13 @@ export const logError = (
 ) => {
   console.error(err);
   next(err);
+};
+
+export const errorHandler = (
+  _: ErrorRequestHandler,
+  __: Request,
+  res: Response,
+  ___: NextFunction
+) => {
+  res.status(500).send("internal server error");
 };
