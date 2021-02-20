@@ -2,6 +2,7 @@ import { Request, Router } from "express";
 
 import { routers } from "./constants";
 import { User } from "../models/user";
+import { auth } from "../middleware/auth";
 
 export const router = Router();
 
@@ -22,7 +23,6 @@ router.post(routers.USER, async (req, res, next) => {
     const token = await user.generateAuthToken();
     res.send({ message: "created a user", token });
   } catch (err) {
-    console.log(err);
     // duplicate email
     if (err?.code === 11000) {
       res.status(400).send({ "Bad Request": err.message });
@@ -33,4 +33,14 @@ router.post(routers.USER, async (req, res, next) => {
     }
     next();
   }
+});
+
+router.post(routers.LOGIN, async (req, res, next) => {
+  const { email, password } = req.body;
+  const user = await User.findByCredentials({ email, password });
+  if (!user) {
+    res.status(404).send("cannot found user");
+  }
+  const token = await user.generateAuthToken();
+  res.send({ message: "success login!", token });
 });

@@ -1,4 +1,4 @@
-import { model, Schema, Document } from "mongoose";
+import { model, Schema, Document, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
@@ -7,9 +7,16 @@ export type User = {
   username: string;
   email: string;
   password: string;
-  tokens: string[];
+  tokens: { token: string }[];
   generateAuthToken: () => Promise<string>;
 } & Document;
+
+export type UserStatics = {
+  findByCredentials: (params: {
+    email: string;
+    password: string;
+  }) => Promise<User>;
+} & Model<User>;
 
 const userSchema: Schema<User> = new Schema(
   {
@@ -40,7 +47,7 @@ const userSchema: Schema<User> = new Schema(
         }
       },
     },
-    tokens: [{ type: String, required: true }],
+    tokens: [{ token: { type: String, required: true } }],
   },
   {
     timestamps: true,
@@ -54,9 +61,31 @@ userSchema.methods.generateAuthToken = async function (): Promise<string> {
     throw new Error("cannot read secret from environment variables");
   }
   const token = jwt.sign({ _id: String(user.id) }, secret);
-  user.tokens = [...user.tokens, token];
+  user.tokens = [...user.tokens, { token }];
   await user.save();
   return token;
+};
+
+userSchema.statics.findByCredentials = async (params: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    const { email, password } = params;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error();
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new Error();
+    }
+
+    return user;
+  } catch (err) {
+    return null;
+  }
 };
 
 // hash password
@@ -68,4 +97,4 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-export const User = model<User>("User", userSchema);
+export const User = model<User, UserStatics>("User", userSchema);
