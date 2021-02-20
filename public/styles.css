@@ -1,6 +1,13 @@
+a {
+  margin: 1em;
+}
+
+body {
+  text-align: center;
+}
+
 h2 {
   margin: 2em auto;
-  text-align: center;
 }
 
 form {
@@ -23,11 +30,8 @@ li + li {
 
 label {
   text-align: right;
+  margin-right: 1em;
   width: 70px;
-}
-
-input {
-  margin-left: 1em;
 }
 
 button {

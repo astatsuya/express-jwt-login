@@ -8,7 +8,10 @@ import * as notFound from "./routers/notFound";
 export const app = express();
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "../public")));
+app.use("/", express.static(path.join(__dirname, "../public")));
+app.use("/login", express.static(path.join(__dirname, "../public/login.html")));
+app.use("/user", express.static(path.join(__dirname, "../public/user.html")));
+
 app.use(user.router);
 app.use(notFound.router);
 
