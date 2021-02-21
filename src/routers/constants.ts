@@ -1,4 +1,4 @@
-export const routers = {
+export const ROUTES = {
   USER: "/users",
   USER_PROFILE: "/users/profile",
   LOGIN: "/users/login",

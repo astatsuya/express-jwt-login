@@ -1,12 +1,12 @@
-import { Request, Router } from "express";
+import { Router } from "express";
 
-import { routers } from "./constants";
+import { ROUTES } from "./constants";
 import { User, UserField } from "../models/user";
 import { auth } from "../middleware/auth";
 
 export const router = Router();
 
-router.get(routers.USER_PROFILE, auth, async (_, res, next) => {
+router.get(ROUTES.USER_PROFILE, auth, async (_, res, next) => {
   try {
     res.send(res.locals.user);
   } catch (err) {
@@ -14,7 +14,7 @@ router.get(routers.USER_PROFILE, auth, async (_, res, next) => {
   }
 });
 
-router.post(routers.USER, async (req, res, next) => {
+router.post(ROUTES.USER, async (req, res, next) => {
   const { username, email, password } = req.body;
   try {
     const user = new User({ username, email, password });
@@ -34,7 +34,7 @@ router.post(routers.USER, async (req, res, next) => {
   }
 });
 
-router.patch(routers.USER_PROFILE, auth, async (req, res, next) => {
+router.patch(ROUTES.USER_PROFILE, auth, async (req, res, next) => {
   try {
     const { user } = res.locals;
     const requestKeys = Object.keys(req.body);
@@ -59,7 +59,7 @@ router.patch(routers.USER_PROFILE, auth, async (req, res, next) => {
   }
 });
 
-router.post(routers.LOGIN, async (req, res, next) => {
+router.post(ROUTES.LOGIN, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findByCredentials({ email, password });
@@ -73,7 +73,7 @@ router.post(routers.LOGIN, async (req, res, next) => {
   }
 });
 
-router.post(routers.LOGOUT, auth, async (_, res, next) => {
+router.post(ROUTES.LOGOUT, auth, async (_, res, next) => {
   try {
     const { user, token: newToken } = res.locals;
     user.tokens = user.tokens.filter((token) => token.token !== newToken);
