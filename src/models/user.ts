@@ -11,10 +11,6 @@ export type UserField = {
 };
 
 export type User = UserField & {
-  username: string;
-  email: string;
-  password: string;
-  tokens: { token: string }[];
   generateAuthToken: () => Promise<string>;
 } & Document;
 
