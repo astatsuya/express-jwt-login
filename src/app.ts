@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import "./db/index";
 import { logErrors, errorHandler } from "./middleware/errorHandler";
 import * as user from "./routers/user";
 import * as notFound from "./routers/notFound";
