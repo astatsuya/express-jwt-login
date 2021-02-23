@@ -52,7 +52,7 @@ router.patch(ROUTES.USER_PROFILE, auth, async (req, res, next) => {
     requestKeys.forEach((key) => {
       user[key as "username" | "password"] = req.body[key];
     });
-    await user.save();
+    // await user.save();
     res.send("user status was updated!");
   } catch (err) {
     next(err);
@@ -79,9 +79,11 @@ router.post(ROUTES.LOGIN, async (req, res, next) => {
 router.post(ROUTES.LOGOUT, auth, async (_, res, next) => {
   try {
     const { user, token: newToken } = res.locals;
-    user.tokens = user.tokens.filter((token) => token.token !== newToken);
-
-    await user.save();
+    const filteredTokens = user.tokens.filter((token) => token !== newToken);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { tokens: filteredTokens },
+    });
     res.send({ message: "logout" });
   } catch (err) {
     next(err);

@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { User } from "../models/user";
+// import { User } from "../models/user";
+import type { User } from "@prisma/client";
+import { prisma } from "../db/prisma";
 
 export const auth = async (
   req: Request,
@@ -17,13 +19,18 @@ export const auth = async (
       throw new Error("cannot read secret from environment variables");
     }
     const decoded: any = jwt.verify(token, secret);
-    const user = await User.findOne({
-      _id: (decoded as { _id: string; iat: number })._id,
-      "tokens.token": token,
-    });
+    const id = Number((decoded as { id: string; iat: number }).id);
+
+    const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new Error();
     }
+
+    const isMatchToken = user?.tokens.find((_token) => _token === token);
+    if (!isMatchToken) {
+      throw new Error();
+    }
+
     res.locals.token = token;
     res.locals.user = user;
     next();
