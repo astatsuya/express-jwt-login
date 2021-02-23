@@ -19,3 +19,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 }
+
+model Todo {
+  id Int @default(autoincrement()) @id
+  description String
+  isCompleted Boolean @default(false)
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
