@@ -1,8 +1,10 @@
 import { Router } from "express";
-
+import { generateAuthToken } from "../models/token";
+import { prisma } from "../db/prisma";
 import { ROUTES } from "./constants";
 import { User, UserField } from "../models/user";
 import { auth } from "../middleware/auth";
+import { hash } from "../middleware/hash";
 
 export const router = Router();
 
@@ -14,22 +16,19 @@ router.get(ROUTES.USER_PROFILE, auth, async (_, res, next) => {
   }
 });
 
-router.post(ROUTES.USER, async (req, res, next) => {
+router.post(ROUTES.USER, hash, async (req, res, next) => {
   const { username, email, password } = req.body;
   try {
-    const user = new User({ username, email, password });
-    await user.save();
-    const token = await user.generateAuthToken();
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password,
+      },
+    });
+    const token = await generateAuthToken(user);
     res.status(201).send({ message: "created a user", token });
   } catch (err) {
-    // duplicate email
-    if (err?.code === 11000) {
-      res.status(400).send({ "Bad Request": err.message });
-    }
-    // invalid field
-    if (err?.errors?.email || err?.errors?.password) {
-      res.status(400).send({ "Bad Request": err.message });
-    }
     next(err);
   }
 });
