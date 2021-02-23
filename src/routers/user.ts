@@ -2,10 +2,9 @@ import { Router } from "express";
 import { findByCredentials, generateAuthToken } from "../models/token";
 import { prisma } from "../db/prisma";
 import { ROUTES } from "./constants";
-import { User, UserField } from "../models/user";
+import { User } from "@prisma/client";
 import { auth } from "../middleware/auth";
 import { hash } from "../middleware/hash";
-import bcrypt from "bcrypt";
 
 export const router = Router();
 
@@ -34,11 +33,11 @@ router.post(ROUTES.USER, hash, async (req, res, next) => {
   }
 });
 
-router.patch(ROUTES.USER_PROFILE, auth, async (req, res, next) => {
+router.patch(ROUTES.USER_PROFILE, auth, hash, async (req, res, next) => {
   try {
     const { user } = res.locals;
     const requestKeys = Object.keys(req.body);
-    const allowedUpdates: (keyof Pick<UserField, "username" | "password">)[] = [
+    const allowedUpdates: (keyof Pick<User, "username" | "password">)[] = [
       "username",
       "password",
     ];
@@ -49,10 +48,16 @@ router.patch(ROUTES.USER_PROFILE, auth, async (req, res, next) => {
     if (!isValidRequest) {
       return res.status(400).send({ error: "Invalid request" });
     }
-    requestKeys.forEach((key) => {
-      user[key as "username" | "password"] = req.body[key];
+
+    const { username, password } = req.body;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        username,
+        password,
+      },
     });
-    // await user.save();
+
     res.send("user status was updated!");
   } catch (err) {
     next(err);
