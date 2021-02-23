@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { generateAuthToken } from "../models/token";
+import { findByCredentials, generateAuthToken } from "../models/token";
 import { prisma } from "../db/prisma";
 import { ROUTES } from "./constants";
 import { User, UserField } from "../models/user";
 import { auth } from "../middleware/auth";
 import { hash } from "../middleware/hash";
+import bcrypt from "bcrypt";
 
 export const router = Router();
 
@@ -61,11 +62,14 @@ router.patch(ROUTES.USER_PROFILE, auth, async (req, res, next) => {
 router.post(ROUTES.LOGIN, async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findByCredentials({ email, password });
+
+    const user = await findByCredentials(email, password);
     if (!user) {
       res.status(404).send("cannot found user");
+      return;
     }
-    const token = await user.generateAuthToken();
+
+    const token = await generateAuthToken(user);
     res.send({ message: "success login!", token });
   } catch (err) {
     next(err);
