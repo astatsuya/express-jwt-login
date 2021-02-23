@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { findByCredentials, generateAuthToken } from "../models/token";
-import { prisma } from "../db/prisma";
+import { prisma, findByCredentials, generateAuthToken } from "../models/user";
 import { ROUTES } from "./constants";
 import { User } from "@prisma/client";
 import { auth } from "../middleware/auth";

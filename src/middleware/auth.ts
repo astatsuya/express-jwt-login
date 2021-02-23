@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import type { User } from "@prisma/client";
-import { prisma } from "../db/prisma";
+import { prisma } from "../models/user";
 
 export const auth = async (
   req: Request,

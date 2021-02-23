@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
-import { prisma } from "../db/prisma";
+import { PrismaClient } from "@prisma/client";
+
+export const prisma = new PrismaClient();
 
 export const generateAuthToken = async (user: User) => {
   const secret = process.env.JWT_SECRET;
